@@ -6,8 +6,8 @@ Yet Another Ruby Lisp.
 
 (I assume that other people have implemented Lisp in ruby so...)
 
-After reading [McCarthy's Paper][paper] for one of the [Boston Software
-Crafstmanship Meetups][bossoftcraft] I decided to try to expand my limited
+After reading [McCarthy's Paper][paper] for one of the 
+[Boston Software Crafstmanship Meetups][bossoftcraft] I decided to try to expand my limited
 knowledge of Ruby by implmenting this Lisp.
 
 That attempt failed - I even deleted the GitHub repository for it.  
