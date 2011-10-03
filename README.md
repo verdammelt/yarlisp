@@ -70,4 +70,4 @@ I hope that this attempt works better.
     evlis[m; a] = [null[m] ! NIL; T ! cons[eval[car[m]; a]; evlis[cdr[m]; a]]]
 
 [paper]: <http://www-formal.stanford.edu/jmc/recursive.pdf>
-[bosoftscraft]: <http://groups.google.com/group/boston-software-craftsmanship?pli=1>
+[bossoftscraft]: <http://groups.google.com/group/boston-software-craftsmanship?pli=1>
