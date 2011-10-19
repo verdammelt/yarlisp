@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    yarlisp (0.0.1)
+    yarlisp (0.0.0)
 
 GEM
   remote: http://rubygems.org/
