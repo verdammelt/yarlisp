@@ -44,15 +44,20 @@ module Yarlisp
 
         if (ATOM expr)
             (CDR (assoc expr, env))
-        elsif (EQ (CAR expr), :QUOTE)
-            (CAR (CDR expr))
-        elsif (EQ (CAR expr), :ATOM)
-            (ATOM (EVAL (CAR (CDR expr)), env))
-        elsif (EQ (CAR expr), :EQ)
-            (EQ (EVAL (CAR (CDR expr)), env),
-             (EVAL (CAR (CDR (CDR expr))), env))
         else
-            :NIL
+            fn=(CAR expr)
+            args=(CDR expr)
+
+            if (EQ fn, :QUOTE)
+                (CAR args)
+            elsif (EQ fn, :ATOM)
+                (ATOM (EVAL (CAR args), env))
+            elsif (EQ fn, :EQ)
+                (EQ (EVAL (CAR args), env),
+                 (EVAL (CAR (CDR args)), env))
+            else
+                :NIL
+            end
         end
     end
 end
