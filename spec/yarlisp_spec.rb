@@ -25,4 +25,17 @@ describe "YARLisp" do
         (CDR [[:x, :y], :z]).should be :z
         expect { (CDR :x) }.to raise_error('Undefined')
     end
+
+    it "cons" do
+        (CONS :x, :y).should eq [:x, :y]
+        (CONS [:x, :y], :z).should eq [[:x, :y], :z]
+    end
+
+    it "relationship of car, cdr and cons" do
+        (CAR(CONS :x, :y)).should be :x
+        (CDR(CONS :x, :y)).should be :y
+
+        x = [:x, :y]
+        (CONS(CAR(x), CDR(x))).should eq x
+    end
 end

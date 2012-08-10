@@ -19,4 +19,8 @@ module Yarlisp
         raise('Undefined') if ATOM(x)
         x[1]
     end
+
+    def CONS(x, y)
+        [x, y]
+    end
 end
