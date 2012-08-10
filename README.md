@@ -68,7 +68,7 @@ where
 and
 
     eval[e; a] = [
-        atom [e] ! assoc [e; a];
+        atom [e] ! [cdr [assoc [e; a]]];
         atom [car [e]] ! [
             eq [car [e]; QUOTE] ! cadr [e];
             eq [car [e]; ATOM] ! atom [eval [cadr [e]; a]];
