@@ -94,5 +94,12 @@ describe "YARLisp" do
                            [[:QUOTE, [[:QUOTE, [:c, :NIL]], :NIL]], :NIL]], :NIL]]]],
                    []).should eq [:a, [:b, :c]]
         end
+
+        it "another case" do
+            (EVAL [[:LABEL, [:x, [:CONS, :NIL]]],
+                   [:a, [[:x, [:b, [:c, :NIL]], :NIL]]]],
+                   [[:a, :m], [[:b, [:QUOTE, [:n, :NIL]]], [[:c, [:QUOTE, [:o, :NIL]]], :NIL]]]).should eq [:m, [:n, :o]]
+
+        end
     end
 end

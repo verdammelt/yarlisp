@@ -61,7 +61,7 @@ module Yarlisp
             end
         end
 
-        puts "(EVAL #{expr} #{env})"
+        #puts "(EVAL #{expr} #{env})"
 
         if (ATOM expr)
             (CDR (assoc expr, env))
@@ -91,7 +91,7 @@ module Yarlisp
         else
             if (EQ (CAR (CAR expr)), :LABEL)
                 (EVAL (CONS (CAR (CDR (CDR (CAR expr)))), (CDR expr)),
-                    (CONS (CONS (CAR (CDR (CAR expr))), (CAR expr)), :NIL))
+                    (CONS (CONS (CAR (CDR (CAR expr))), (CAR expr)), env))
             end
         end
     end
