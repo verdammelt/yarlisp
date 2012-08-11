@@ -25,12 +25,11 @@ module Yarlisp
     end
 
     def EVAL(expr, env)
-        puts "(EVAL #{expr}, #{env})"
         def equal(a, b)
             if (ATOM a) && (ATOM b)
                 a.eql? b
-            elsif (equal (CAR a), (CAR b))
-                (equal (CDR a), (CDR b)) 
+            elsif !(ATOM a) && !(ATOM b)
+                (equal (CAR a), (CAR b)) && (equal (CDR a), (CDR b))
             else
                 false
             end
@@ -51,6 +50,17 @@ module Yarlisp
                 (EVAL (CAR (CDR (CAR x))), a)
             else
                 (cond (CDR x), a)
+            end
+        end
+
+        def evlis(m, a)
+            def null(val)
+                (equal val, :NIL)
+            end
+            if (null m) 
+                :NIL
+            else
+                (CONS (EVAL (CAR m), a), (evlis (CDR m), a))
             end
         end
 
@@ -77,7 +87,7 @@ module Yarlisp
             elsif (EQ fn, :COND)
                 (cond args, env)
             else
-                :NIL
+                (EVAL (CONS (CDR (assoc fn, env)), (evlis args, env)), env)
             end
         end
     end

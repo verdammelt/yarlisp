@@ -74,7 +74,12 @@ describe "YARLisp" do
         it "handles COND function" do
             (EVAL [:COND, [[:x, [:y, :NIL]]]], [[:x, :a], [[:y, :b], :NIL]]).should eq :b
             (EVAL [:COND, [[:x, [:y, :NIL]], [[:z, [:a, :NIL]], :NIL]]],
-[[:x, :NIL], [[:z, :b], [[:a, :c], :NIL]]]).should eq :c
+             [[:x, :NIL], [[:z, :b], [[:a, :c], :NIL]]]).should eq :c
+        end
+
+        it "handles recursive evaluation" do
+            (EVAL [:x, [:y, [:z, :NIL]]],
+             [[:x, :CONS], [[:y, [:QUOTE, [:b, :NIL]]], [[:z, [:QUOTE, [:c, :NIL]]], :NIL]]]).should eq [:b, :c]
         end
     end
 end
