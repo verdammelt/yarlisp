@@ -87,6 +87,12 @@ describe "YARLisp" do
             (EVAL [[:LABEL, [:x, [:CONS, :NIL]]], 
                    [[:QUOTE, [:a, :NIL]], [[:QUOTE, [:b, :NIL]], :NIL]]],
                    []).should eq [:a, :b]
+
+            (EVAL [[:LABEL, [:x, [:CONS, :NIL]]], 
+                   [[:QUOTE, [:a, :NIL]], 
+                    [[:x, [[:QUOTE, [[:QUOTE, [:b, :NIL]], :NIL]], 
+                           [[:QUOTE, [[:QUOTE, [:c, :NIL]], :NIL]], :NIL]], :NIL]]]],
+                   []).should eq [:a, [:b, :c]]
         end
     end
 end

@@ -91,15 +91,9 @@ module Yarlisp
         else
             if (EQ (CAR (CAR expr)), :LABEL)
                 (EVAL (CONS (CAR (CDR (CDR (CAR expr)))), (CDR expr)),
-                    env)
+                    (CONS (CONS (CAR (CDR (CAR expr))), (CAR expr)), :NIL))
             end
         end
     end
 end
 
-#(eval ((label, f, E), e1, ... en), a)
-#(eval (E e1...en) (append ((f (label f E))) a))
-#
-#The evaluation of ((LABEL, f, E), e1, · · · , en) is accomplished by eval-
-#           uating (E, e1, · · · , en) with the pairing (f, (LABEL, f, E)) put on the front of
-#       the previous list a of pairs.
