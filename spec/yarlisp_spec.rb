@@ -70,5 +70,11 @@ describe "YARLisp" do
         it "handles CONS function" do
             (EVAL [:CONS, [:x, [:y, :NIL]]], [[:x, :a], [[:y, :b], :NIL]]).should eq [:a, :b]
         end
+
+        it "handles COND function" do
+            (EVAL [:COND, [[:x, [:y, :NIL]]]], [[:x, :a], [[:y, :b], :NIL]]).should eq :b
+            (EVAL [:COND, [[:x, [:y, :NIL]], [[:z, [:a, :NIL]], :NIL]]],
+[[:x, :NIL], [[:z, :b], [[:a, :c], :NIL]]]).should eq :c
+        end
     end
 end
