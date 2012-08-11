@@ -58,7 +58,17 @@ describe "YARLisp" do
             (EVAL [:EQ, [:x, [:y, :NIL]]], [[:x, :a], [[:y, :a], :NIL]]).should be_true
             (EVAL [:EQ, [:x, [:y, :NIL]]], [[:x, :a], [[:y, :b], :NIL]]).should_not be_true
         end
+
+        it "handles CAR function" do
+            (EVAL [:CAR, [:x, [:y, :NIL]]], [[:x, :a]]).should eq :a
+        end
+
+        it "handles CDR function" do
+            (EVAL [:CDR, [:x, :y]], [[:y, :a]]).should eq :a
+        end
+
+        it "handles CONS function" do
+            (EVAL [:CONS, [:x, [:y, :NIL]]], [[:x, :a], [[:y, :b], :NIL]]).should eq [:a, :b]
+        end
     end
-
-
 end

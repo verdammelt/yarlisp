@@ -55,6 +55,13 @@ module Yarlisp
             elsif (EQ fn, :EQ)
                 (EQ (EVAL (CAR args), env),
                  (EVAL (CAR (CDR args)), env))
+            elsif (EQ fn, :CAR)
+                (EVAL (CAR args), env)
+            elsif (EQ fn, :CDR)
+                (EVAL (CDR args), env)
+            elsif (EQ fn, :CONS)
+                (CONS (EVAL (CAR args), env),
+                 (EVAL (CAR (CDR args)), env))
             else
                 :NIL
             end
