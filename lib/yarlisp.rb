@@ -34,6 +34,9 @@ module Yarlisp
                 false
             end
         end
+        def null(val)
+            (equal val, :NIL)
+        end
         def assoc(x, a)
             if (equal (CAR (CAR a)), x)
                 (CAR a)
@@ -42,11 +45,8 @@ module Yarlisp
             end
         end
         def cond(x, a)
-            def is_true?(val)
-                !(val.eql? :NIL)
-            end
             condition = (EVAL (CAR (CAR x)), a)
-            if (is_true?(condition))
+            if (!(null condition))
                 (EVAL (CAR (CDR (CAR x))), a)
             else
                 (cond (CDR x), a)
@@ -54,9 +54,6 @@ module Yarlisp
         end
 
         def evlis(m, a)
-            def null(val)
-                (equal val, :NIL)
-            end
             if (null m) 
                 :NIL
             else
@@ -64,9 +61,11 @@ module Yarlisp
             end
         end
 
+        puts "(EVAL #{expr} #{env})"
+
         if (ATOM expr)
             (CDR (assoc expr, env))
-        else
+        elsif (ATOM (CAR expr))
             fn=(CAR expr)
             args=(CDR expr)
 
@@ -89,6 +88,18 @@ module Yarlisp
             else
                 (EVAL (CONS (CDR (assoc fn, env)), (evlis args, env)), env)
             end
+        else
+            if (EQ (CAR (CAR expr)), :LABEL)
+                (EVAL (CONS (CAR (CDR (CDR (CAR expr)))), (CDR expr)),
+                    env)
+            end
         end
     end
 end
+
+#(eval ((label, f, E), e1, ... en), a)
+#(eval (E e1...en) (append ((f (label f E))) a))
+#
+#The evaluation of ((LABEL, f, E), e1, · · · , en) is accomplished by eval-
+#           uating (E, e1, · · · , en) with the pairing (f, (LABEL, f, E)) put on the front of
+#       the previous list a of pairs.

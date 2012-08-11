@@ -47,6 +47,7 @@ describe "YARLisp" do
 
         it "handles QUOTE function" do
             (EVAL [:QUOTE, [:x, :NIL]], []).should eq :x
+            (EVAL [:QUOTE, [[:x, :y], :NIL]], []).should eq [:x, :y]
         end
 
         it "handles ATOM function" do
@@ -80,6 +81,12 @@ describe "YARLisp" do
         it "handles recursive evaluation" do
             (EVAL [:x, [:y, [:z, :NIL]]],
              [[:x, :CONS], [[:y, [:QUOTE, [:b, :NIL]]], [[:z, [:QUOTE, [:c, :NIL]]], :NIL]]]).should eq [:b, :c]
+        end
+
+        it "handles LABELS function (used to create a binding))" do
+            (EVAL [[:LABEL, [:x, [:CONS, :NIL]]], 
+                   [[:QUOTE, [:a, :NIL]], [[:QUOTE, [:b, :NIL]], :NIL]]],
+                   []).should eq [:a, :b]
         end
     end
 end
