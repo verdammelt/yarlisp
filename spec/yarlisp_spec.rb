@@ -84,22 +84,20 @@ describe "YARLisp" do
         end
 
         it "handles LABELS function (used to create a binding))" do
-            (EVAL [[:LABEL, [:x, [:CONS, :NIL]]], 
-                   [[:QUOTE, [:a, :NIL]], [[:QUOTE, [:b, :NIL]], :NIL]]],
-                   []).should eq [:a, :b]
+            args = [:a, [[:x, [:b, [:c, :NIL]], :NIL]]]
+            env = [[:a, :m], 
+                   [[:b, [:QUOTE, [:n, :NIL]]], 
+                    [[:c, [:QUOTE, [:o, :NIL]]], :NIL]]]
 
-            (EVAL [[:LABEL, [:x, [:CONS, :NIL]]], 
-                   [[:QUOTE, [:a, :NIL]], 
-                    [[:x, [[:QUOTE, [[:QUOTE, [:b, :NIL]], :NIL]], 
-                           [[:QUOTE, [[:QUOTE, [:c, :NIL]], :NIL]], :NIL]], :NIL]]]],
-                   []).should eq [:a, [:b, :c]]
+            (EVAL [[:LABEL, [:x, [:CONS, :NIL]]], args], env).should eq [:m, [:n, :o]]
         end
 
-        it "another case" do
-            (EVAL [[:LABEL, [:x, [:CONS, :NIL]]],
-                   [:a, [[:x, [:b, [:c, :NIL]], :NIL]]]],
-                   [[:a, :m], [[:b, [:QUOTE, [:n, :NIL]]], [[:c, [:QUOTE, [:o, :NIL]]], :NIL]]]).should eq [:m, [:n, :o]]
-
+        it "handles LAMBDA" do
+            # ((lambda ((x . nil) ((cons (x (x . nil))) . nil))) ((quote (a . nil)) . nil))
+            #(eval '((lambda ((x . nil) ((cons (x (x . nil)) . nil)) . nil)) ((quote (a . nil))))k
+            (EVAL [[:LAMBDA, [[:x, :NIL], [[:CONS, [:x, [:x, :NIL]]], :NIL]]], 
+                   [[:QUOTE, [:a, :NIL]], :NIL]], 
+                   []).should eq [:a, :a]
         end
     end
 end

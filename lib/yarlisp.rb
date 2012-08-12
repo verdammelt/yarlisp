@@ -52,16 +52,13 @@ module Yarlisp
                 (cond (CDR x), a)
             end
         end
-
-        def evlis(m, a)
+        def eval_list(m, a)
             if (null m) 
                 :NIL
             else
-                (CONS (EVAL (CAR m), a), (evlis (CDR m), a))
+                (CONS (EVAL (CAR m), a), (eval_list (CDR m), a))
             end
         end
-
-        #puts "(EVAL #{expr} #{env})"
 
         if (ATOM expr)
             (CDR (assoc expr, env))
@@ -86,12 +83,27 @@ module Yarlisp
             elsif (EQ fn, :COND)
                 (cond args, env)
             else
-                (EVAL (CONS (CDR (assoc fn, env)), (evlis args, env)), env)
+                (EVAL (CONS (CDR (assoc fn, env)), (eval_list args, env)), env)
             end
         else
             if (EQ (CAR (CAR expr)), :LABEL)
                 (EVAL (CONS (CAR (CDR (CDR (CAR expr)))), (CDR expr)),
                     (CONS (CONS (CAR (CDR (CAR expr))), (CAR expr)), env))
+            elsif (EQ (CAR (CAR expr)), :LAMBDA)
+                def pair(x, y)
+                    puts "(pair #{x} #{y})"
+                    return :NIL if (null x) and (null y)
+                    if !(ATOM x) and !(ATOM y)
+                        (CONS (CONS (CAR x), (CAR y)), (pair (CDR x), (CDR y)))
+                    end
+                end
+                def append(x, y)
+                    return y if (null x)
+                    (CONS (CAR x), (append (CDR x), y))
+                end
+                #eval [caddar [e]; append [pair [cadar [e]; eval_list [cdr [e]; a]; a]]]
+                (EVAL (CAR (CDR (CDR (CAR expr)))),
+                 (append (pair (CAR (CDR (CAR expr))), (eval_list (CDR expr), env)), env))
             end
         end
     end
