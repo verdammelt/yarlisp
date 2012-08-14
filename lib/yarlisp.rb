@@ -27,15 +27,15 @@ module Yarlisp
     def EVAL(expr, env)
         def equal(a, b)
             if (ATOM a) && (ATOM b)
-                a.eql? b
+                (EQ a, b)
             elsif !(ATOM a) && !(ATOM b)
                 (equal (CAR a), (CAR b)) && (equal (CDR a), (CDR b))
             else
-                false
+                :NIL
             end
         end
         def null(val)
-            (equal val, :NIL)
+            (ATOM val) && (EQ val, :NIL)
         end
         def assoc(x, a)
             if (equal (CAR (CAR a)), x)
@@ -91,7 +91,6 @@ module Yarlisp
                     (CONS (CONS (CAR (CDR (CAR expr))), (CAR expr)), env))
             elsif (EQ (CAR (CAR expr)), :LAMBDA)
                 def pair(x, y)
-                    puts "(pair #{x} #{y})"
                     return :NIL if (null x) and (null y)
                     if !(ATOM x) and !(ATOM y)
                         (CONS (CONS (CAR x), (CAR y)), (pair (CDR x), (CDR y)))
@@ -101,7 +100,7 @@ module Yarlisp
                     return y if (null x)
                     (CONS (CAR x), (append (CDR x), y))
                 end
-                #eval [caddar [e]; append [pair [cadar [e]; eval_list [cdr [e]; a]; a]]]
+
                 (EVAL (CAR (CDR (CDR (CAR expr)))),
                  (append (pair (CAR (CDR (CAR expr))), (eval_list (CDR expr), env)), env))
             end
