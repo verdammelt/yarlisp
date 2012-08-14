@@ -84,7 +84,7 @@ describe "YARLisp" do
         end
 
         it "handles LABELS function (used to create a binding))" do
-            args = [:a, [[:x, [:b, [:c, :NIL]], :NIL]]]
+            args = [:a, [[:x, [:b, [:c, :NIL]]]]]
             env = [[:a, :m], 
                    [[:b, [:QUOTE, [:n, :NIL]]], 
                     [[:c, [:QUOTE, [:o, :NIL]]], :NIL]]]
