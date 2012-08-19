@@ -1,7 +1,7 @@
 require 'yarlisp'
 
 describe "YARLisp" do
-    include Yarlisp
+    include Yarlisp::Core
 
     it "atoms" do
         (ATOM :x).should be_true
