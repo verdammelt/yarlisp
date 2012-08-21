@@ -4,14 +4,13 @@ describe "YARLisp" do
     include Yarlisp::Core
 
     it "atoms" do
-        (ATOM :x).should be_true
-        (ATOM [:x, :y]).should_not be_true
+        (ATOM :x).should eq :T
+        (ATOM [:x, :y]).should eq :NIL
     end
 
     it "eq" do
-        (EQ :x, :x).should be_true
-        (EQ :x, :y).should be_false
-        expect { (EQ :x, [:a, :b]) }.to raise_error('Undefined')
+        (EQ :x, :x).should eq :T
+        (EQ :x, :y).should eq :NIL
     end
 
     it "car" do
@@ -51,13 +50,13 @@ describe "YARLisp" do
         end
 
         it "handles ATOM function" do
-            (EVAL [:ATOM, [:x, :NIL]], [[:x, :y]]).should be_true
-            (EVAL [:ATOM, [:x, :NIL]], [[:x, [:a, :b]]]).should_not be_true
+            (EVAL [:ATOM, [:x, :NIL]], [[:x, :y]]).should eq :T
+            (EVAL [:ATOM, [:x, :NIL]], [[:x, [:a, :b]]]).should eq :NIL
         end
 
         it "handles EQ function" do
-            (EVAL [:EQ, [:x, [:y, :NIL]]], [[:x, :a], [[:y, :a], :NIL]]).should be_true
-            (EVAL [:EQ, [:x, [:y, :NIL]]], [[:x, :a], [[:y, :b], :NIL]]).should_not be_true
+            (EVAL [:EQ, [:x, [:y, :NIL]]], [[:x, :a], [[:y, :a], :NIL]]).should eq :T
+            (EVAL [:EQ, [:x, [:y, :NIL]]], [[:x, :a], [[:y, :b], :NIL]]).should eq :NIL
         end
 
         it "handles CAR function" do
