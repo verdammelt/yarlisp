@@ -93,11 +93,38 @@ describe "YARLisp" do
         end
 
         it "handles LAMBDA" do
-            # ((lambda ((x . nil) ((cons (x (x . nil))) . nil))) ((quote (a . nil)) . nil))
-            #(eval '((lambda ((x . nil) ((cons (x (x . nil)) . nil)) . nil)) ((quote (a . nil))))k
             (EVAL [[:LAMBDA, [[:x, :NIL], [[:CONS, [:x, [:x, :NIL]]], :NIL]]], 
                    [[:QUOTE, [:a, :NIL]], :NIL]], 
                    []).should eq [:a, :a]
         end
+    end
+
+    describe "b0rked COND" do
+        xit "second COND test" do
+            (EVAL [:COND, [[[:EQ, [:x, [:NIL, :NIL]]], [:y, :NIL]], [[:z, [:a, :NIL]], :NIL]]],
+             [[:x, :NIL], [[:z, :b], [[:a, :c], [[:y, :m], :NIL]]]]).should eq :m
+        end
+
+        xit "cond is not broken" do
+            fn = [:COND, 
+                  [[[:ATOM, [:X, :NIL]], [:X, :NIL]], 
+                   [[[:QUOTE, [:T, :NIL]], [[:CAR, [:X, :NIL]], :NIL]], :NIL]]]
+            #(EVAL fn, [[:X, :A]]).should eq :A
+            (EVAL fn, [[:X, [:B, :A]]]).should eq :B
+        end
+    end
+
+    xit "can handle the ff defintion" do
+        # (LABEL, FF, (LAMBDA, (X), (COND, (ATOM, X), X), ((QUOTE, T),(FF, (CAR, X)))))
+        fn = [:LABEL,
+              [:FF,
+               [[:LAMBDA,
+                 [[:X, :NIL],
+                  [[:COND,
+                    [[[:ATOM, [:X, :NIL]], [:X, :NIL]],
+                     [[[:QUOTE, [:T, :NIL]], [[:CAR, [:X, NIL]], :NIL]], :NIL]]], :NIL]]], :NIL]]]
+        arg = [:QUOTE, [[[[:A, :B], :C], :NIL], :NIL]]
+        env = []
+        (EVAL [fn, [arg, :NIL]], env).should eq :A
     end
 end
