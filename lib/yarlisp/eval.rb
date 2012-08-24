@@ -27,8 +27,8 @@ module Yarlisp
 
         def EVAL(expr, env)
             def null(val)
-                # TODO: why can't i say (EQ...) == :T?
-                ((ATOM val) == :T) && (EQ val, :NIL) 
+                isnull = ((ATOM val) == :T) && ((EQ val, :NIL) == :T)
+                (isnull) ? :T : :NIL
             end
             def equal(a, b)
                 if (ATOM a) == :T && (ATOM b) == :T
