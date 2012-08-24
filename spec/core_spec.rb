@@ -16,12 +16,14 @@ describe "YARLisp" do
     it "car" do
         (CAR [:x, :y]).should eq :x
         (CAR [[:x, :y], :z]).should eq [:x, :y]
+        (CAR []).should eq :NIL
         expect { (CAR :x) }.to raise_error('Undefined')
     end
 
     it "cdr" do
         (CDR [:x, :y]).should eq :y
         (CDR [[:x, :y], :z]).should eq :z
+        (CDR []).should eq :NIL
         expect { (CDR :x) }.to raise_error('Undefined')
     end
 
@@ -47,6 +49,7 @@ describe "YARLisp" do
         it "handles QUOTE function" do
             (EVAL [:QUOTE, [:x, :NIL]], []).should eq :x
             (EVAL [:QUOTE, [[:x, :y], :NIL]], []).should eq [:x, :y]
+            (EVAL [:QUOTE, [[:x, [:y, :NIL]], :NIL]], []).should eq [:x, [:y, :NIL]]
         end
 
         it "handles ATOM function" do
@@ -60,11 +63,15 @@ describe "YARLisp" do
         end
 
         it "handles CAR function" do
-            (EVAL [:CAR, [:x, [:y, :NIL]]], [[:x, :a]]).should eq :a
+            (EVAL [:CAR, [:x, :NIL]], [[:x, [:a, :b]]]).should eq :a
+            (EVAL [:CAR, [[:QUOTE, [[:x, [:y, :NIL]], :NIL]], :NIL]], []).should eq :x
+            (EVAL [:CAR, [[:CONS, [:x, [:y, :NIL]]], :NIL]], [[:x, :a], [[:y, :b], :NIL]]).should eq :a
         end
 
         it "handles CDR function" do
-            (EVAL [:CDR, [:x, :y]], [[:y, :a]]).should eq :a
+            (EVAL [:CDR, [:x, :NIL]], [[:x, [:a, :b]]]).should eq :b
+            (EVAL [:CDR, [[:QUOTE, [[:x, :y], :NIL]], :NIL]], []).should eq :y
+            (EVAL [:CDR, [[:CONS, [:x, [:y, :NIL]]], :NIL]], [[:x, :a], [[:y, :b], :NIL]]).should eq :b
         end
 
         it "handles CONS function" do
@@ -73,8 +80,12 @@ describe "YARLisp" do
 
         it "handles COND function" do
             (EVAL [:COND, [[:x, [:y, :NIL]]]], [[:x, :a], [[:y, :b], :NIL]]).should eq :b
+
             (EVAL [:COND, [[:x, [:y, :NIL]], [[:z, [:a, :NIL]], :NIL]]],
              [[:x, :NIL], [[:z, :b], [[:a, :c], :NIL]]]).should eq :c
+
+            (EVAL [:COND, [[[:EQ, [:x, [:NIL, :NIL]]], [:y, :NIL]], [[:z, [:a, :NIL]], :NIL]]],
+             [[:x, :NIL], [[:z, :b], [[:a, :c], [[:y, :m], :NIL]]]]).should eq :m
         end
 
         it "handles recursive evaluation" do
@@ -98,23 +109,7 @@ describe "YARLisp" do
         end
     end
 
-    describe "b0rked COND" do
-        xit "second COND test" do
-            (EVAL [:COND, [[[:EQ, [:x, [:NIL, :NIL]]], [:y, :NIL]], [[:z, [:a, :NIL]], :NIL]]],
-             [[:x, :NIL], [[:z, :b], [[:a, :c], [[:y, :m], :NIL]]]]).should eq :m
-        end
-
-        xit "cond is not broken" do
-            fn = [:COND, 
-                  [[[:ATOM, [:X, :NIL]], [:X, :NIL]], 
-                   [[[:QUOTE, [:T, :NIL]], [[:CAR, [:X, :NIL]], :NIL]], :NIL]]]
-            #(EVAL fn, [[:X, :A]]).should eq :A
-            (EVAL fn, [[:X, [:B, :A]]]).should eq :B
-        end
-    end
-
-    xit "can handle the ff defintion" do
-        # (LABEL, FF, (LAMBDA, (X), (COND, (ATOM, X), X), ((QUOTE, T),(FF, (CAR, X)))))
+    it "can handle the ff defintion" do
         fn = [:LABEL,
               [:FF,
                [[:LAMBDA,
@@ -122,7 +117,7 @@ describe "YARLisp" do
                   [[:COND,
                     [[[:ATOM, [:X, :NIL]], [:X, :NIL]],
                      [[[:QUOTE, [:T, :NIL]], [[:CAR, [:X, NIL]], :NIL]], :NIL]]], :NIL]]], :NIL]]]
-        arg = [:QUOTE, [[[[:A, :B], :C], :NIL], :NIL]]
+        arg = [:QUOTE, [[:A, [:B, :NIL]], [:C, :NIL]]]
         env = []
         (EVAL [fn, [arg, :NIL]], env).should eq :A
     end

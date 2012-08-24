@@ -1,8 +1,7 @@
 module Yarlisp
     module Core
         def ATOM(x)
-            return :NIL if (x.is_a? Array)
-            return :T
+            (x.is_a? Array) ? :NIL : :T
         end
 
         def EQ(x, y)
@@ -12,11 +11,13 @@ module Yarlisp
 
         def CAR(x)
             raise('Undefined') if (ATOM x) == :T
+            return :NIL if x.empty?
             x[0]
         end
 
         def CDR(x)
             raise('Undefined') if (ATOM x) == :T
+            return :NIL if x.empty?
             x[1]
         end
 
@@ -26,7 +27,8 @@ module Yarlisp
 
         def EVAL(expr, env)
             def null(val)
-                (ATOM val) && (EQ val, :NIL)
+                # TODO: why can't i say (EQ...) == :T?
+                ((ATOM val) == :T) && (EQ val, :NIL) 
             end
             def equal(a, b)
                 if (ATOM a) == :T && (ATOM b) == :T
@@ -46,8 +48,9 @@ module Yarlisp
                 end
             end
             def assoc(x, a)
+                return [] if (null a) == :T
                 first = (CAR a)
-                if (equal (CAR first), x) == :T
+                if (equal (CAR first), x)  == :T
                     first
                 else
                     (assoc x, (CDR a))
@@ -75,9 +78,9 @@ module Yarlisp
                     (EQ (EVAL (CAR args), env),
                      (EVAL (CAR (CDR args)), env))
                 elsif (EQ fn, :CAR) == :T
-                    (EVAL (CAR args), env)
+                    (CAR (EVAL (CAR args), env))
                 elsif (EQ fn, :CDR) == :T
-                    (EVAL (CDR args), env)
+                    (CDR (EVAL (CAR args), env))
                 elsif (EQ fn, :CONS) == :T
                     (CONS (EVAL (CAR args), env),
                      (EVAL (CAR (CDR args)), env))
