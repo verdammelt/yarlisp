@@ -38,14 +38,16 @@ module Yarlisp
             end
             def assoc(x, a)
                 if (equal (CAR (CAR a)), x)
-                    (CAR a)
+                    (CDR (CAR a))
                 else
                     (assoc x, (CDR a))
                 end
             end
             def cond(x, a)
                 condition = (EVAL (CAR (CAR x)), a)
-                if (!(null condition))
+                puts "condition = (EVAL #{(CAR (CAR x))} #{a}) => #{condition}"
+                if (condition == true || (EQ condition, :T))
+                    puts "(EVAL #{(CAR (CDR (CAR x)))} #{a})"
                     (EVAL (CAR (CDR (CAR x))), a)
                 else
                     (cond (CDR x), a)
@@ -60,7 +62,7 @@ module Yarlisp
             end
 
             if (ATOM expr)
-                (CDR (assoc expr, env))
+                (assoc expr, env)
             elsif (ATOM (CAR expr))
                 fn=(CAR expr)
                 args=(CDR expr)
@@ -73,6 +75,7 @@ module Yarlisp
                     (EQ (EVAL (CAR args), env),
                      (EVAL (CAR (CDR args)), env))
                 elsif (EQ fn, :CAR)
+                    puts "(EVAL #{CAR args}, #{env})"
                     (EVAL (CAR args), env)
                 elsif (EQ fn, :CDR)
                     (EVAL (CDR args), env)
@@ -82,7 +85,7 @@ module Yarlisp
                 elsif (EQ fn, :COND)
                     (cond args, env)
                 else
-                    (EVAL (CONS (CDR (assoc fn, env)), (eval_list args, env)), env)
+                    (EVAL (CONS (assoc fn, env), (eval_list args, env)), env)
                 end
             else
                 if (EQ (CAR (CAR expr)), :LABEL)

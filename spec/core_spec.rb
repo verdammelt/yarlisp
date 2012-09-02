@@ -62,6 +62,7 @@ describe "YARLisp" do
 
         it "handles CAR function" do
             (EVAL [:CAR, [:x, [:y, :NIL]]], [[:x, :a]]).should eq :a
+            (EVAL [:CAR, [:x, :NIL]], [[:x, [:a, :b]]]).should eq :a
         end
 
         it "handles CDR function" do
@@ -76,6 +77,11 @@ describe "YARLisp" do
             (EVAL [:COND, [[:x, [:y, :NIL]]]], [[:x, :a], [[:y, :b], :NIL]]).should eq :b
             (EVAL [:COND, [[:x, [:y, :NIL]], [[:z, [:a, :NIL]], :NIL]]],
              [[:x, :NIL], [[:z, :b], [[:a, :c], :NIL]]]).should eq :c
+
+            fn = [:COND, 
+                  [[[:ATOM, [:X, :NIL]], [[:QUOTE, [:ATOM, :NIL]]], :NIL], 
+                   [[[:QUOTE, [:T, :NIL]], [[:QUOTE, [:LIST, :NIL]], :NIL]], :NIL]]]
+            (EVAL fn, [[:X, [:B, :A]]]).should eq :LIST
         end
 
         it "handles recursive evaluation" do
@@ -105,13 +111,24 @@ describe "YARLisp" do
              [[:x, :NIL], [[:z, :b], [[:a, :c], [[:y, :m], :NIL]]]]).should eq :m
         end
 
-        xit "cond is not broken" do
+        it "cond is not broken" do
             # (cond ((atom x) x) ((quote t) (car x)))
+            # [:COND, [[[:ATOM, [:X, :NIL]], [:X, :NIL]], [[[:QUOTE [:T, :NIL]], [[:CAR [:X, :NIL]], :NIL]], :NIL]]]
+            fn = [:COND, 
+                  [[[:ATOM, [:X, :NIL]], [[:QUOTE, [:ATOM, :NIL]]], :NIL], 
+                   [[[:QUOTE, [:T, :NIL]], [[:QUOTE, [:LIST, :NIL]], :NIL]], :NIL]]]
+            (EVAL fn, [[:X, [:B, :A]]]).should eq :LIST
+        end
+
+        it "cond is not broken" do
+            # (cond ((atom x) x) ((quote t) (car x)))
+            # [:COND, [[[:ATOM, [:X, :NIL]], [:X, :NIL]], [[[:QUOTE [:T, :NIL]], [[:CAR [:X, :NIL]], :NIL]], :NIL]]]
             fn = [:COND, 
                   [[[:ATOM, [:X, :NIL]], [:X, :NIL]], 
                    [[[:QUOTE, [:T, :NIL]], [[:CAR, [:X, :NIL]], :NIL]], :NIL]]]
             (EVAL fn, [[:X, [:B, :A]]]).should eq :B
         end
+
     end
 
     xit "can handle the ff defintion" do
