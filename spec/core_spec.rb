@@ -106,24 +106,25 @@ describe "YARLisp" do
         end
 
         xit "cond is not broken" do
+            # (cond ((atom x) x) ((quote t) (car x)))
             fn = [:COND, 
                   [[[:ATOM, [:X, :NIL]], [:X, :NIL]], 
                    [[[:QUOTE, [:T, :NIL]], [[:CAR, [:X, :NIL]], :NIL]], :NIL]]]
-            #(EVAL fn, [[:X, :A]]).should eq :A
             (EVAL fn, [[:X, [:B, :A]]]).should eq :B
         end
     end
 
     xit "can handle the ff defintion" do
-        # (LABEL, FF, (LAMBDA, (X), (COND, (ATOM, X), X), ((QUOTE, T),(FF, (CAR, X)))))
+        # ((label ff (lambda (x) (cond ((atom x) x) (t (ff (car x)))))) (quote ((a b) c)
         fn = [:LABEL,
               [:FF,
                [[:LAMBDA,
                  [[:X, :NIL],
                   [[:COND,
                     [[[:ATOM, [:X, :NIL]], [:X, :NIL]],
-                     [[[:QUOTE, [:T, :NIL]], [[:CAR, [:X, NIL]], :NIL]], :NIL]]], :NIL]]], :NIL]]]
-        arg = [:QUOTE, [[[[:A, :B], :C], :NIL], :NIL]]
+                     [[[:QUOTE, [:T, :NIL]], 
+                       [[:FF, [[:CAR, [:X, :NIL]]]], :NIL]], :NIL]]], :NIL]]], :NIL]]]
+        arg = [:QUOTE, [[:A, [:B, :NIL]], [:C, :NIL]]]
         env = []
         (EVAL [fn, [arg, :NIL]], env).should eq :A
     end
