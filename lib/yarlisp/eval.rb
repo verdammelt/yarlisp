@@ -64,6 +64,8 @@ module Yarlisp
                 end
             end
 
+            puts "(EVAL #{expr}, #{env})"
+
             if (ATOM expr) == :T
                 (CDR (assoc expr, env))
             elsif (ATOM (CAR expr)) == :T

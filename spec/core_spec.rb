@@ -109,14 +109,30 @@ describe "YARLisp" do
         end
     end
 
-    it "can handle the ff defintion" do
+    it "THIS TEST IS WRONG" do
         fn = [:LABEL,
               [:FF,
                [[:LAMBDA,
                  [[:X, :NIL],
                   [[:COND,
                     [[[:ATOM, [:X, :NIL]], [:X, :NIL]],
-                     [[[:QUOTE, [:T, :NIL]], [[:CAR, [:X, NIL]], :NIL]], :NIL]]], :NIL]]], :NIL]]]
+                     [[[:QUOTE, [:T, :NIL]], 
+                       [[:CAR, [:X, NIL]], :NIL]], :NIL]]], :NIL]]], :NIL]]]
+        arg = [:QUOTE, [[:A, [:B, :NIL]], [:C, :NIL]]]
+        env = []
+        (EVAL [fn, [arg, :NIL]], env).should eq :A
+    end
+
+    it "can handle the ff defintion" do
+        # ((label ff (lambda (x) (cond ((atom x) x) (t (ff (car x)))))) (quote ((a b) c)
+        fn = [:LABEL,
+              [:FF,
+               [[:LAMBDA,
+                 [[:X, :NIL],
+                  [[:COND,
+                    [[[:ATOM, [:X, :NIL]], [:X, :NIL]],
+                     [[[:QUOTE, [:T, :NIL]], 
+                       [[:FF, [[:CAR, [:X, :NIL]]]], :NIL]], :NIL]]], :NIL]]], :NIL]]]
         arg = [:QUOTE, [[:A, [:B, :NIL]], [:C, :NIL]]]
         env = []
         (EVAL [fn, [arg, :NIL]], env).should eq :A
