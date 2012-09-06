@@ -61,27 +61,42 @@ describe "YARLisp" do
         end
 
         it "handles CAR function" do
-            (EVAL [:CAR, [:x, [:y, :NIL]]], [[:x, :a]]).should eq :a
             (EVAL [:CAR, [:x, :NIL]], [[:x, [:a, :b]]]).should eq :a
         end
 
         it "handles CDR function" do
-            (EVAL [:CDR, [:x, :y]], [[:y, :a]]).should eq :a
+            (EVAL [:CDR, [:x, :NIL]], [[:x, [:a, :b]]]).should eq :b
         end
 
         it "handles CONS function" do
             (EVAL [:CONS, [:x, [:y, :NIL]]], [[:x, :a], [[:y, :b], :NIL]]).should eq [:a, :b]
         end
 
-        it "handles COND function" do
-            (EVAL [:COND, [[:x, [:y, :NIL]]]], [[:x, :a], [[:y, :b], :NIL]]).should eq :b
-            (EVAL [:COND, [[:x, [:y, :NIL]], [[:z, [:a, :NIL]], :NIL]]],
-             [[:x, :NIL], [[:z, :b], [[:a, :c], :NIL]]]).should eq :c
+        describe "handles COND function" do
+            it "handles COND function" do
+                (EVAL [:COND, [[:x, [:y, :NIL]]]], [[:x, :a], [[:y, :b], :NIL]]).should eq :b
+            end
 
-            fn = [:COND, 
-                  [[[:ATOM, [:X, :NIL]], [[:QUOTE, [:ATOM, :NIL]]], :NIL], 
-                   [[[:QUOTE, [:T, :NIL]], [[:QUOTE, [:LIST, :NIL]], :NIL]], :NIL]]]
-            (EVAL fn, [[:X, [:B, :A]]]).should eq :LIST
+            it "Chooses the branch that is NON-NIL" do
+                fn = [:COND, [[:x, [:y, :NIL]], [[:z, [:a, :NIL]], :NIL]]]
+                env = [[:x, :NIL], [[:z, :b], [[:a, :c], :NIL]]]
+                (EVAL fn, env).should eq :c
+            end
+
+            it "evaluates the predicates" do
+                fn = [:COND, [[[:EQ, [:x, [[:QUOTE, [:a, :NIL]]]]], [:y, :NIL]], [[:z, [:a, :NIL]], :NIL]]] 
+                env = [[:x, :a], [[:y, :m], :NIL]]
+                (EVAL fn, env).should eq :m
+            end
+
+            it "another predicate evaluation test" do
+                fn = [:COND, 
+                      [[[:ATOM, [:x, :NIL]], [[:QUOTE, [:ATOM, :NIL]], :NIL]],
+                       [[:QUOTE, [:T, :NIL]], [[:QUOTE, [:LIST, :NIL]]]], :NIL]]
+                (EVAL fn, [[:x, :a]]).should eq :ATOM
+
+                (EVAL fn, [[:x, [:a, :b]]]).should eq :LIST
+            end
         end
 
         it "handles recursive evaluation" do
@@ -105,34 +120,8 @@ describe "YARLisp" do
         end
     end
 
-    describe "b0rked COND" do
-        xit "second COND test" do
-            (EVAL [:COND, [[[:EQ, [:x, [:NIL, :NIL]]], [:y, :NIL]], [[:z, [:a, :NIL]], :NIL]]],
-             [[:x, :NIL], [[:z, :b], [[:a, :c], [[:y, :m], :NIL]]]]).should eq :m
-        end
-
-        it "cond is not broken" do
-            # (cond ((atom x) x) ((quote t) (car x)))
-            # [:COND, [[[:ATOM, [:X, :NIL]], [:X, :NIL]], [[[:QUOTE [:T, :NIL]], [[:CAR [:X, :NIL]], :NIL]], :NIL]]]
-            fn = [:COND, 
-                  [[[:ATOM, [:X, :NIL]], [[:QUOTE, [:ATOM, :NIL]]], :NIL], 
-                   [[[:QUOTE, [:T, :NIL]], [[:QUOTE, [:LIST, :NIL]], :NIL]], :NIL]]]
-            (EVAL fn, [[:X, [:B, :A]]]).should eq :LIST
-        end
-
-        it "cond is not broken" do
-            # (cond ((atom x) x) ((quote t) (car x)))
-            # [:COND, [[[:ATOM, [:X, :NIL]], [:X, :NIL]], [[[:QUOTE [:T, :NIL]], [[:CAR [:X, :NIL]], :NIL]], :NIL]]]
-            fn = [:COND, 
-                  [[[:ATOM, [:X, :NIL]], [:X, :NIL]], 
-                   [[[:QUOTE, [:T, :NIL]], [[:CAR, [:X, :NIL]], :NIL]], :NIL]]]
-            (EVAL fn, [[:X, [:B, :A]]]).should eq :B
-        end
-
-    end
-
-    xit "can handle the ff defintion" do
-        # ((label ff (lambda (x) (cond ((atom x) x) (t (ff (car x)))))) (quote ((a b) c)
+    it "can handle the ff defintion" do
+       # ((label ff (lambda (x) (cond ((atom x) x) (t (ff (car x)))))) (quote ((a b) c)
         fn = [:LABEL,
               [:FF,
                [[:LAMBDA,
