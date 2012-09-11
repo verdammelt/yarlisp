@@ -91,10 +91,10 @@ describe "YARLisp" do
 
             it "another predicate evaluation test" do
                 fn = [:COND, 
-                      [[[:ATOM, [:x, :NIL]], [[:QUOTE, [:ATOM, :NIL]], :NIL]],
-                       [[:QUOTE, [:T, :NIL]], [[:QUOTE, [:LIST, :NIL]]]], :NIL]]
-                (EVAL fn, [[:x, :a]]).should eq :ATOM
+                      [[[:ATOM, [:x, :NIL]], [[:QUOTE, [:ATOM, :NIL]], :NIL]], 
+                       [[[:QUOTE, [:T, :NIL]], [[:QUOTE, [:LIST, :NIL]], :NIL]], :NIL]]]
 
+                (EVAL fn, [[:x, :a]]).should eq :ATOM
                 (EVAL fn, [[:x, [:a, :b]]]).should eq :LIST
             end
         end

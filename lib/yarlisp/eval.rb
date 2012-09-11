@@ -45,10 +45,10 @@ module Yarlisp
             end
             def cond(x, a)
                 condition = (EVAL (CAR (CAR x)), a)
-                if (condition == true || !(EQ condition, :NIL))
-                    (EVAL (CAR (CDR (CAR x))), a)
-                else
+                if (condition == false || (EQ condition, :NIL))
                     (cond (CDR x), a)
+                else
+                    (EVAL (CAR (CDR (CAR x))), a)
                 end
             end
             def eval_list(m, a)
@@ -59,23 +59,16 @@ module Yarlisp
                 end
             end
 
-            puts "*(eval #{expr})"
-
             if (ATOM expr)
                 (assoc expr, env)
             elsif (ATOM (CAR expr))
                 fn=(CAR expr)
                 args=(CDR expr)
 
-                puts "(#{fn} #{args})"
-
                 if (EQ fn, :QUOTE)
                     (CAR args)
                 elsif (EQ fn, :ATOM)
-                    val=(EVAL (CAR args), env)
-                    ret=(ATOM val)
-                    puts "(ATOM #{val}) => #{ret}"
-                    ret
+                    (ATOM (EVAL (CAR args), env))
                 elsif (EQ fn, :EQ)
                     (EQ (EVAL (CAR args), env),
                      (EVAL (CAR (CDR args)), env))
