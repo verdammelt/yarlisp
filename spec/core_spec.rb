@@ -3,41 +3,43 @@ require 'yarlisp'
 describe "YARLisp" do
     include Yarlisp::Core
 
-    it "atoms" do
-        (ATOM :x).should eq :T
-        (ATOM [:x, :y]).should eq :NIL
-    end
+    describe "primitives" do
+        it "atoms" do
+            (ATOM :x).should eq :T
+            (ATOM [:x, :y]).should eq :NIL
+        end
 
-    it "eq" do
-        (EQ :x, :x).should eq :T
-        (EQ :x, :y).should eq :NIL
-    end
+        it "eq" do
+            (EQ :x, :x).should eq :T
+            (EQ :x, :y).should eq :NIL
+        end
 
-    it "car" do
-        (CAR [:x, :y]).should eq :x
-        (CAR [[:x, :y], :z]).should eq [:x, :y]
-        (CAR []).should eq :NIL
-        expect { (CAR :x) }.to raise_error('Undefined')
-    end
+        it "car" do
+            (CAR [:x, :y]).should eq :x
+            (CAR [[:x, :y], :z]).should eq [:x, :y]
+            (CAR []).should eq :NIL
+            expect { (CAR :x) }.to raise_error('Undefined')
+        end
 
-    it "cdr" do
-        (CDR [:x, :y]).should eq :y
-        (CDR [[:x, :y], :z]).should eq :z
-        (CDR []).should eq :NIL
-        expect { (CDR :x) }.to raise_error('Undefined')
-    end
+        it "cdr" do
+            (CDR [:x, :y]).should eq :y
+            (CDR [[:x, :y], :z]).should eq :z
+            (CDR []).should eq :NIL
+            expect { (CDR :x) }.to raise_error('Undefined')
+        end
 
-    it "cons" do
-        (CONS :x, :y).should eq [:x, :y]
-        (CONS [:x, :y], :z).should eq [[:x, :y], :z]
-    end
+        it "cons" do
+            (CONS :x, :y).should eq [:x, :y]
+            (CONS [:x, :y], :z).should eq [[:x, :y], :z]
+        end
 
-    it "relationship of car, cdr and cons" do
-        (CAR(CONS :x, :y)).should eq :x
-        (CDR(CONS :x, :y)).should eq :y
+        it "relationship of car, cdr and cons" do
+            (CAR(CONS :x, :y)).should eq :x
+            (CDR(CONS :x, :y)).should eq :y
 
-        x = [:x, :y]
-        (CONS(CAR(x), CDR(x))).should eq x
+            x = [:x, :y]
+            (CONS(CAR(x), CDR(x))).should eq x
+        end
     end
 
     context "eval" do
@@ -92,7 +94,7 @@ describe "YARLisp" do
             end
 
             it "another predicate evaluation test" do
-                fn = [:COND, 
+                fn = [:COND,
                       [[[:ATOM, [:x, :NIL]], [[:QUOTE, [:ATOM, :NIL]], :NIL]], 
                        [[[:QUOTE, [:T, :NIL]], [[:QUOTE, [:LIST, :NIL]], :NIL]], :NIL]]]
 
@@ -108,8 +110,8 @@ describe "YARLisp" do
 
         it "handles LABELS function (used to create a binding))" do
             args = [:a, [[:x, [:b, [:c, :NIL]]]]]
-            env = [[:a, :m], 
-                   [[:b, :n], 
+            env = [[:a, :m],
+                   [[:b, :n],
                     [[:c, :o], :NIL]]]
 
             (EVAL [[:LABEL, [:x, [:CONS, :NIL]]], args], env).should eq [:m, [:n, :o]]
@@ -117,30 +119,21 @@ describe "YARLisp" do
 
         it "handles LAMBDA" do
             (EVAL [[:LAMBDA, [[:x, :NIL], [[:CONS, [:x, [:x, :NIL]]], :NIL]]], 
-                   [[:QUOTE, [:a, :NIL]], :NIL]], 
+                   [[:QUOTE, [:a, :NIL]], :NIL]],
                    []).should eq [:a, :a]
         end
     end
 
     it "can handle the ff defintion" do
-        # ((label ff (lambda (x) (cond ((atom x) x) (t (ff (car x)))))) (quote ((a b) c)
-        # fn = [:LABEL,
-        #       [:FF,
-        #        [[:LAMBDA,
-        #          [[:X, :NIL],
-        #           [[:COND,
-        #             [[[:ATOM, [:X, :NIL]], [:X, :NIL]],
-        #              [[[:QUOTE, [:T, :NIL]], 
-        #                [[:FF, [[:CAR, [:X, :NIL]]]], :NIL]], :NIL]]], :NIL]]], :NIL]]]
-        p1 = [:ATOM, [:x, :NIL]]
-        e1 = :x
-        p2 = [:QUOTE, [:T, :NIL]]
-        e2 = [:FF, [[:CAR, [:x, :NIL]], :NIL]]
-        c1 = [p1, [e1, :NIL]]
-        c2 = [p2, [e2, :NIL]]
-        cond = [:COND, [c1, [c2, :NIL]]]
-        l = [:LAMBDA, [[:x, :NIL], [cond, :NIL]]]
-        fn = [:LABEL, [:FF, [l, :NIL]]]
+        fn = [:LABEL,
+              [:FF,
+               [[:LAMBDA,
+                 [[:x, :NIL],
+                  [[:COND,
+                    [[[:ATOM, [:x, :NIL]], [:x, :NIL]],
+                     [[[:QUOTE, [:T, :NIL]],
+                       [[:FF, [[:CAR, [:x, :NIL]], :NIL]], :NIL]], :NIL]]],
+                     :NIL]]], :NIL]]]
         arg = [:QUOTE, [[[:A, [:B, :NIL]], [:C, :NIL]], :NIL]]
         env = []
         (EVAL [fn, [arg, :NIL]], env).should eq :A
