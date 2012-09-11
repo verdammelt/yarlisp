@@ -82,7 +82,7 @@ module Yarlisp
                 elsif (EQ fn, :COND)
                     (cond args, env)
                 else
-                    (EVAL (CONS (assoc fn, env), (eval_list args, env)), env)
+                    (EVAL (CONS (assoc fn, env), args), env)
                 end
             else
                 if (EQ (CAR (CAR expr)), :LABEL)
