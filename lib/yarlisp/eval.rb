@@ -26,34 +26,32 @@ module Yarlisp
         end
 
         def EVAL(expr, env)
-            def null(val)
-                isnull = ((ATOM val) == :T) && ((EQ val, :NIL) == :T)
-                (isnull) ? :T : :NIL
-            end
             def equal(a, b)
-                if (ATOM a) == :T && (ATOM b) == :T
+                if ((ATOM a) == :T) && ((ATOM b) == :T)
                     (EQ a, b)
-                elsif (ATOM a) == :NIL && (ATOM b) == :NIL
+                elsif ((ATOM a) == :NIL) && ((ATOM b) == :NIL)
                     (equal (CAR a), (CAR b)) && (equal (CDR a), (CDR b))
                 else
                     :NIL
                 end
             end
-            def cond(x, a)
-                condition = (EVAL (CAR (CAR x)), a)
-                if condition != :NIL
-                    (EVAL (CAR (CDR (CAR x))), a)
-                else
-                    (cond (CDR x), a)
-                end
+            def null(val)
+                return :T if ((ATOM val) == :T) && ((EQ val, :NIL) == :T)
+                return :NIL
             end
             def assoc(x, a)
-                return [] if (null a) == :T
-                first = (CAR a)
-                if (equal (CAR first), x)  == :T
-                    first
+                if (equal (CAR (CAR a)), x) == :T
+                    (CDR (CAR a))
                 else
                     (assoc x, (CDR a))
+                end
+            end
+            def cond(x, a)
+                condition = (EVAL (CAR (CAR x)), a)
+                if (EQ condition, :NIL) == :T
+                    (cond (CDR x), a)
+                else
+                    (EVAL (CAR (CDR (CAR x))), a)
                 end
             end
             def eval_list(m, a)
@@ -65,7 +63,7 @@ module Yarlisp
             end
 
             if (ATOM expr) == :T
-                (CDR (assoc expr, env))
+                (assoc expr, env)
             elsif (ATOM (CAR expr)) == :T
                 fn=(CAR expr)
                 args=(CDR expr)
@@ -87,7 +85,7 @@ module Yarlisp
                 elsif (EQ fn, :COND) == :T
                     (cond args, env)
                 else
-                    (EVAL (CONS (CDR (assoc fn, env)), (eval_list args, env)), env)
+                    (EVAL (CONS (assoc fn, env), args), env)
                 end
             else
                 if (EQ (CAR (CAR expr)), :LABEL) == :T
