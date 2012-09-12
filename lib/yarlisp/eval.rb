@@ -5,20 +5,17 @@ module Yarlisp
         end
 
         def EQ(x, y)
-            return :T if x.eql?(y)
-            return :NIL
+            x.eql?(y) ? :T : :NIL
         end
 
         def CAR(x)
             raise('Undefined') if (ATOM x) == :T
-            return :NIL if x.empty?
-            x[0]
+            x.empty? ? :NIL : x[0]
         end
 
         def CDR(x)
             raise('Undefined') if (ATOM x) == :T
-            return :NIL if x.empty?
-            x[1]
+            x.empty? ? :NIL : x[1]
         end
 
         def CONS(x, y)
@@ -26,32 +23,21 @@ module Yarlisp
         end
 
         def EVAL(expr, env)
-            def equal(a, b)
-                if ((ATOM a) == :T) && ((ATOM b) == :T)
-                    (EQ a, b)
-                elsif ((ATOM a) == :NIL) && ((ATOM b) == :NIL)
-                    (equal (CAR a), (CAR b)) && (equal (CDR a), (CDR b))
-                else
-                    :NIL
-                end
-            end
             def null(val)
-                return :T if ((ATOM val) == :T) && ((EQ val, :NIL) == :T)
-                return :NIL
+                (EQ val, :NIL)
             end
             def assoc(x, a)
-                if (equal (CAR (CAR a)), x) == :T
+                if (EQ (CAR (CAR a)), x) == :T
                     (CDR (CAR a))
                 else
                     (assoc x, (CDR a))
                 end
             end
-            def cond(x, a)
-                condition = (EVAL (CAR (CAR x)), a)
-                if (EQ condition, :NIL) == :T
-                    (cond (CDR x), a)
-                else
+            def evcon(x, a)
+                if (EQ (EVAL (CAR (CAR x)), a), :NIL) == :NIL
                     (EVAL (CAR (CDR (CAR x))), a)
+                else
+                    (evcon (CDR x), a)
                 end
             end
             def eval_list(m, a)
@@ -61,6 +47,41 @@ module Yarlisp
                     (CONS (EVAL (CAR m), a), (eval_list (CDR m), a))
                 end
             end
+            def yar_not(x)
+                if (null x) == :T
+                    return :T
+                else
+                    return :NIL
+                end
+            end
+            def yar_and(x, y)
+                if (x == :T)
+                    if (y == :T)
+                        return :T
+                    else
+                        return :NIL
+                    end
+                else
+                    return :NIL
+                end
+            end
+            def pair(x, y)
+                if (yar_and (null x), (null y)) == :T
+                    return :NIL
+                else
+                    if (yar_and (yar_not (ATOM x)), (yar_not (ATOM y)))
+                        return (CONS (CONS (CAR x), (CAR y)), (pair (CDR x), (CDR y)))
+                    end
+                end
+            end
+            def append(x, y)
+                if (null x) == :T
+                    return y
+                else
+                    (CONS (CAR x), (append (CDR x), y))
+                end
+            end
+
 
             if (ATOM expr) == :T
                 (assoc expr, env)
@@ -83,7 +104,7 @@ module Yarlisp
                     (CONS (EVAL (CAR args), env),
                      (EVAL (CAR (CDR args)), env))
                 elsif (EQ fn, :COND) == :T
-                    (cond args, env)
+                    (evcon args, env)
                 else
                     (EVAL (CONS (assoc fn, env), args), env)
                 end
@@ -92,17 +113,6 @@ module Yarlisp
                     (EVAL (CONS (CAR (CDR (CDR (CAR expr)))), (CDR expr)),
                      (CONS (CONS (CAR (CDR (CAR expr))), (CAR expr)), env))
                 elsif (EQ (CAR (CAR expr)), :LAMBDA) == :T
-                    def pair(x, y)
-                        return :NIL if (null x) == :T and (null y) == :T
-                        if (null (ATOM x)) == :T and (null (ATOM y)) == :T
-                            (CONS (CONS (CAR x), (CAR y)), (pair (CDR x), (CDR y)))
-                        end
-                    end
-                    def append(x, y)
-                        return y if (null x) == :T
-                        (CONS (CAR x), (append (CDR x), y))
-                    end
-
                     (EVAL (CAR (CDR (CDR (CAR expr)))),
                      (append (pair (CAR (CDR (CAR expr))), (eval_list (CDR expr), env)), env))
                 end
