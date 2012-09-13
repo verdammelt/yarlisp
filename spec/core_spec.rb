@@ -45,6 +45,7 @@ describe "YARLisp" do
             (COND [lambda {:T}, lambda{:A}]).should eq :A
             (COND [lambda {:NIL}, lambda{:A}], [lambda {:T}, lambda{:B}]).should eq :B
             (COND [lambda {:X}, lambda{:A}], [lambda{:T}, lambda{:B}]).should eq :A
+            (COND [lambda {:NIL}, lambda{:A}]).should eq :NIL
         end
     end
 
