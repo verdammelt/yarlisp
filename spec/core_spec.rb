@@ -40,6 +40,12 @@ describe "YARLisp" do
             x = [:x, :y]
             (CONS(CAR(x), CDR(x))).should eq x
         end
+
+        it "cond" do
+            (COND [lambda {:T}, lambda{:A}]).should eq :A
+            (COND [lambda {:NIL}, lambda{:A}], [lambda {:T}, lambda{:B}]).should eq :B
+            (COND [lambda {:X}, lambda{:A}], [lambda{:T}, lambda{:B}]).should eq :A
+        end
     end
 
     context "eval" do
