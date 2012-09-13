@@ -81,33 +81,30 @@ module Yarlisp
                 return (assoc expr, env)
             else
                 if (ATOM (CAR expr)) == :T
-                    fn=(CAR expr)
-                    args=(CDR expr)
-
-                    if (EQ fn, :QUOTE) == :T
-                        return (CAR args)
+                    if (EQ (CAR expr), :QUOTE) == :T
+                        return (CAR (CDR expr))
                     else
-                        if (EQ fn, :ATOM) == :T
-                            return (ATOM (EVAL (CAR args), env))
+                        if (EQ (CAR expr), :ATOM) == :T
+                            return (ATOM (EVAL (CAR (CDR expr)), env))
                         else
-                            if (EQ fn, :EQ) == :T
-                                return (EQ (EVAL (CAR args), env),
-                                        (EVAL (CAR (CDR args)), env))
+                            if (EQ (CAR expr), :EQ) == :T
+                                return (EQ (EVAL (CAR (CDR expr)), env),
+                                        (EVAL (CAR (CDR (CDR expr))), env))
                             else
-                                if (EQ fn, :CAR) == :T
-                                    return (CAR (EVAL (CAR args), env))
+                                if (EQ (CAR expr), :CAR) == :T
+                                    return (CAR (EVAL (CAR (CDR expr)), env))
                                 else
-                                    if (EQ fn, :CDR) == :T
-                                        return (CDR (EVAL (CAR args), env))
+                                    if (EQ (CAR expr), :CDR) == :T
+                                        return (CDR (EVAL (CAR (CDR expr)), env))
                                     else
-                                        if (EQ fn, :CONS) == :T
-                                            return (CONS (EVAL (CAR args), env),
-                                                    (EVAL (CAR (CDR args)), env))
+                                        if (EQ (CAR expr), :CONS) == :T
+                                            return (CONS (EVAL (CAR (CDR expr)), env),
+                                                    (EVAL (CAR (CDR (CDR expr))), env))
                                         else
-                                            if (EQ fn, :COND) == :T
-                                                return (evcon args, env)
+                                            if (EQ (CAR expr), :COND) == :T
+                                                return (evcon (CDR expr), env)
                                             else
-                                                return (EVAL (CONS (assoc fn, env), args), env)
+                                                return (EVAL (CONS (assoc (CAR expr), env), (CDR expr)), env)
                                             end
                                         end
                                     end
