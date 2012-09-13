@@ -42,10 +42,10 @@ describe "YARLisp" do
         end
 
         it "cond" do
-            (COND [lambda {:T}, lambda{:A}]).should eq :A
-            (COND [lambda {:NIL}, lambda{:A}], [lambda {:T}, lambda{:B}]).should eq :B
-            (COND [lambda {:X}, lambda{:A}], [lambda{:T}, lambda{:B}]).should eq :A
-            (COND [lambda {:NIL}, lambda{:A}]).should eq :NIL
+            (COND [-> {:T}, ->{:A}]).should eq :A
+            (COND [-> {:NIL}, ->{:A}], [-> {:T}, ->{:B}]).should eq :B
+            (COND [-> {:X}, ->{:A}], [->{:T}, ->{:B}]).should eq :A
+            (COND [-> {:NIL}, ->{:A}]).should eq :NIL
         end
     end
 
